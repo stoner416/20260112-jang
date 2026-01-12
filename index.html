@@ -2,10 +2,11 @@
 <html lang="ko">
   <head>
     <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta
       name="description"
-      content="6학년 1반 소식, 가정통신문 신청, 회원가입과 로그인, 메모 게시판까지 모두 담은 학급 홈페이지입니다."
+      content="6학년 1반 소식, 가정통신문 신청, 회원가입·로그인, 자유게시판을 모두 담은 학급 홈페이지입니다."
     />
     <meta property="og:title" content="6학년 1반 우리 반 홈페이지" />
     <meta property="og:description" content="가정과 학급이 함께 만나는 따뜻한 소통 공간" />
@@ -128,6 +129,11 @@
         transform: translateY(-2px);
         box-shadow: 0 10px 22px rgba(255, 138, 91, 0.4);
       }
+      button:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        box-shadow: none;
+      }
       .grid-two {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -220,9 +226,7 @@
           <h2 id="news-title">가정통신문 & 새 소식</h2>
           <span style="color: var(--muted)">업데이트일: 2025-12-12</span>
         </div>
-        <div class="cards" data-notice-list>
-          <!-- JS에서 채웁니다 -->
-        </div>
+        <div class="cards" data-notice-list></div>
       </section>
 
       <section aria-labelledby="newsletter-title">
@@ -281,12 +285,33 @@
     </main>
     <footer>© 2025 6학년 1반 · 문의: homeroom@classroom.kr</footer>
     <div class="toast" role="status" aria-live="polite"></div>
-    <script>
-      const notices = [
-        { title: "12월 체육대회", desc: "12월 20일(금) 운동장에서 6학년 체육대회가 열립니다. 간편한 운동복과 물을 준비해주세요.", date: "2025-12-12" },
-        { title: "겨울 방학 안내", desc: "방학은 12월 30일부터 시작합니다. 독서 기록장을 12월 27일까지 제출해주세요.", date: "2025-12-10" },
-        { title: "학부모 상담 주간", desc: "12월 둘째 주에 상담이 진행됩니다. 신청 폼에서 편한 시간을 골라주세요.", date: "2025-12-08" }
-      ];
+
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
+      import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-analytics.js";
+      import {
+        getFirestore,
+        collection,
+        addDoc,
+        getDocs,
+        serverTimestamp,
+        query,
+        orderBy
+      } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
+
+      const firebaseConfig = {
+        apiKey: "AIzaSyCYkqiS_gyhfArVTIV4OPIPAzc8DGn333k",
+        authDomain: "jang-db278.firebaseapp.com",
+        projectId: "jang-db278",
+        storageBucket: "jang-db278.firebasestorage.app",
+        messagingSenderId: "636003735694",
+        appId: "1:636003735694:web:281075a5a4a3ce5c68d1df",
+        measurementId: "G-DTBMH9JVTN"
+      };
+
+      const app = initializeApp(firebaseConfig);
+      getAnalytics(app);
+      const db = getFirestore(app);
 
       const toast = document.querySelector(".toast");
       const showToast = (message) => {
@@ -296,6 +321,12 @@
           toast.dataset.show = "false";
         }, 2600);
       };
+
+      const notices = [
+        { title: "12월 체육대회", desc: "12월 20일(금) 운동장에서 6학년 체육대회가 열립니다. 간편한 운동복과 물을 준비해주세요.", date: "2025-12-12" },
+        { title: "겨울 방학 안내", desc: "방학은 12월 30일부터 시작합니다. 독서 기록장을 12월 27일까지 제출해주세요.", date: "2025-12-10" },
+        { title: "학부모 상담 주간", desc: "12월 둘째 주에 상담이 진행됩니다. 신청 폼에서 편한 시간을 골라주세요.", date: "2025-12-08" }
+      ];
 
       const noticeContainer = document.querySelector("[data-notice-list]");
       noticeContainer.innerHTML = notices
@@ -311,35 +342,70 @@
         .join("");
 
       const boardList = document.querySelector("[data-board-list]");
-      const addBoardItem = (item) => {
+      const addBoardItem = (item, { prepend = false } = {}) => {
         const li = document.createElement("li");
-        li.innerHTML = \`<strong>\${item.messageWriter}</strong><p style="margin:0.35rem 0">\${item.messageContent}</p><time>\${new Date(
-          item.date
-        ).toLocaleString("ko-KR")}</time>\`;
-        boardList.prepend(li);
+        const rawDate = item.createdAt?.toDate ? item.createdAt.toDate() : new Date(item.createdAt || Date.now());
+        li.innerHTML = `<strong>${item.messageWriter}</strong><p style="margin:0.35rem 0">${item.messageContent}</p><time>${rawDate.toLocaleString(
+          "ko-KR"
+        )}</time>`;
+        if (prepend) {
+          boardList.prepend(li);
+        } else {
+          boardList.append(li);
+        }
       };
 
-      const persistForm = (formName, data) => {
-        const key = \`class6-\${formName}\`;
-        const stored = JSON.parse(localStorage.getItem(key) || "[]");
-        stored.push({ ...data, date: new Date().toISOString() });
-        localStorage.setItem(key, JSON.stringify(stored));
-        return stored.at(-1);
+      const loadBoardMessages = async () => {
+        boardList.innerHTML = "<li>게시판을 불러오는 중입니다...</li>";
+        try {
+          const boardQuery = query(collection(db, "board"), orderBy("createdAt", "desc"));
+          const snapshot = await getDocs(boardQuery);
+          boardList.innerHTML = "";
+          if (snapshot.empty) {
+            boardList.innerHTML = "<li>첫 메시지를 남겨주세요!</li>";
+            return;
+          }
+          snapshot.forEach((doc) => addBoardItem(doc.data()));
+        } catch (error) {
+          console.error(error);
+          boardList.innerHTML = "<li>메시지를 불러오지 못했어요. 새로고침 해주세요.</li>";
+        }
+      };
+
+      const messages = {
+        newsletter: "가정통신문 신청이 완료되었어요!",
+        signup: "회원가입 신청이 Firestore에 저장되었습니다!",
+        login: "로그인 요청이 기록되었습니다!",
+        board: "메시지가 게시판에 추가되었어요!"
       };
 
       document.querySelectorAll("form[data-form]").forEach((form) => {
-        form.addEventListener("submit", (event) => {
+        form.addEventListener("submit", async (event) => {
           event.preventDefault();
+          const submitButton = form.querySelector('button[type="submit"]');
+          submitButton.disabled = true;
           const formName = form.dataset.form;
           const formData = Object.fromEntries(new FormData(form).entries());
-          const saved = persistForm(formName, formData);
-          form.reset();
-          if (formName === "board") addBoardItem(saved);
-          showToast("신청이 저장되었어요! (GitHub Pages 데모용)");
+          try {
+            await addDoc(collection(db, formName), {
+              ...formData,
+              createdAt: serverTimestamp()
+            });
+            if (formName === "board") {
+              addBoardItem({ ...formData, createdAt: new Date() }, { prepend: true });
+            }
+            showToast(messages[formName] ?? "저장되었습니다.");
+            form.reset();
+          } catch (error) {
+            console.error(error);
+            showToast("저장 중 문제가 발생했어요. 잠시 후 다시 시도해주세요.");
+          } finally {
+            submitButton.disabled = false;
+          }
         });
       });
 
-      JSON.parse(localStorage.getItem("class6-board") || "[]").forEach(addBoardItem);
+      loadBoardMessages();
     </script>
   </body>
 </html>
