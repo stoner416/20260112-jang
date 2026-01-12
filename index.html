@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="6학년 1반 소식, 가정통신문 신청, 회원가입과 로그인, 메모 게시판까지 모두 담은 학급 홈페이지입니다."
+    />
+    <meta property="og:title" content="6학년 1반 우리 반 홈페이지" />
+    <meta property="og:description" content="가정과 학급이 함께 만나는 따뜻한 소통 공간" />
+    <meta name="theme-color" content="#ff8a5b" />
+    <title>6학년 1반 우리 반 홈페이지</title>
+    <style>
+      :root {
+        --primary: #ff8a5b;
+        --secondary: #ffcb77;
+        --accent: #ffeaae;
+        --surface: #ffffff;
+        --text: #1f1f1f;
+        --muted: #6b6b6b;
+        font-family: "Pretendard", "맑은 고딕", "Malgun Gothic", system-ui, -apple-system, BlinkMacSystemFont,
+          "Segoe UI", sans-serif;
+        color-scheme: light;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background: radial-gradient(circle at top left, #fff5ed, #fff8f0);
+        color: var(--text);
+      }
+      header {
+        background: linear-gradient(130deg, #ffb347, var(--primary));
+        color: #fff;
+        padding: 3.5rem 1.5rem 5rem;
+        text-align: center;
+        border-bottom-left-radius: 80px;
+        border-bottom-right-radius: 80px;
+        box-shadow: 0 18px 45px rgba(255, 138, 91, 0.35);
+      }
+      header h1 {
+        margin: 0 0 0.75rem;
+        font-size: clamp(2rem, 4vw, 3.5rem);
+        letter-spacing: -0.02em;
+      }
+      header p {
+        margin: 0 auto;
+        max-width: 520px;
+        line-height: 1.5;
+        font-size: 1.1rem;
+      }
+      main {
+        max-width: 1080px;
+        margin: -60px auto 80px;
+        padding: 0 1.5rem;
+      }
+      section {
+        background: var(--surface);
+        border-radius: 30px;
+        padding: 2rem;
+        margin-top: 1.75rem;
+        box-shadow: 0 18px 40px rgba(255, 138, 91, 0.15);
+      }
+      h2 {
+        margin-top: 0;
+        color: var(--primary);
+        font-size: 1.6rem;
+      }
+      .cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 1rem;
+        margin-top: 1.25rem;
+      }
+      .card {
+        border-radius: 20px;
+        padding: 1.25rem;
+        background: var(--accent);
+        border: 2px dashed var(--secondary);
+      }
+      .card h3 {
+        margin: 0 0 0.35rem;
+      }
+      form {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+        margin-top: 1rem;
+      }
+      label {
+        font-weight: 600;
+      }
+      input,
+      textarea {
+        border: 2px solid #ffe1c4;
+        border-radius: 16px;
+        padding: 0.85rem 1rem;
+        font-size: 1rem;
+        font-family: inherit;
+        transition: border 0.2s ease, box-shadow 0.2s ease;
+        background: #fffdf9;
+      }
+      input:focus,
+      textarea:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(255, 138, 91, 0.2);
+      }
+      textarea {
+        min-height: 110px;
+        resize: vertical;
+      }
+      button {
+        border: none;
+        border-radius: 999px;
+        padding: 0.9rem;
+        font-size: 1rem;
+        font-weight: bold;
+        color: #fff;
+        background: linear-gradient(130deg, var(--secondary), var(--primary));
+        cursor: pointer;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+      }
+      button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 22px rgba(255, 138, 91, 0.4);
+      }
+      .grid-two {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 1.25rem;
+      }
+      .list {
+        list-style: none;
+        padding: 0;
+        margin: 1rem 0 0;
+        display: grid;
+        gap: 0.9rem;
+      }
+      .list li {
+        background: #fff9f3;
+        border-radius: 18px;
+        padding: 0.85rem 1rem;
+        border: 1px solid #ffe3ca;
+      }
+      .list time {
+        color: var(--muted);
+        font-size: 0.9rem;
+      }
+      .toast {
+        position: fixed;
+        left: 50%;
+        bottom: 32px;
+        transform: translateX(-50%) translateY(200%);
+        background: var(--primary);
+        color: #fff;
+        padding: 0.85rem 1.5rem;
+        border-radius: 999px;
+        box-shadow: 0 15px 30px rgba(255, 138, 91, 0.4);
+        transition: transform 0.4s ease;
+        z-index: 10;
+      }
+      .toast[data-show="true"] {
+        transform: translateX(-50%) translateY(0);
+      }
+      footer {
+        text-align: center;
+        margin: 2.5rem 0;
+        color: var(--muted);
+        font-size: 0.95rem;
+      }
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          transition-duration: 0.01ms !important;
+          animation-duration: 0.01ms !important;
+        }
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          color-scheme: dark;
+          --surface: #1f1f28;
+          --text: #f5f5f7;
+          --muted: #b5b5c0;
+        }
+        body {
+          background: radial-gradient(circle at top left, #332b3a, #1d1b2f);
+        }
+        section {
+          box-shadow: 0 18px 40px rgba(0, 0, 0, 0.4);
+        }
+        .card {
+          background: rgba(255, 234, 174, 0.08);
+        }
+        input,
+        textarea {
+          background: #2b2a33;
+          color: inherit;
+          border-color: #3c3b45;
+        }
+        .list li {
+          background: rgba(255, 249, 243, 0.08);
+          border-color: #3b3140;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>6학년 1반 우리 반 홈페이지</h1>
+      <p>장준형 선생님과 함께하는 즐거운 교실, 가정과 학교가 만나는 따뜻한 소통 공간</p>
+    </header>
+    <main>
+      <section aria-labelledby="news-title">
+        <div style="display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.75rem">
+          <h2 id="news-title">가정통신문 & 새 소식</h2>
+          <span style="color: var(--muted)">업데이트일: 2025-12-12</span>
+        </div>
+        <div class="cards" data-notice-list>
+          <!-- JS에서 채웁니다 -->
+        </div>
+      </section>
+
+      <section aria-labelledby="newsletter-title">
+        <h2 id="newsletter-title">가정통신문 이메일로 받기</h2>
+        <p>가정에서 간편하게 소식을 받아보세요. 신청하면 다음 발송에 자동으로 포함됩니다.</p>
+        <form data-form="newsletter">
+          <label for="parent-name">학부모님 성함</label>
+          <input type="text" id="parent-name" name="parentName" placeholder="예: 김우리" required />
+          <label for="student-name">학생 이름</label>
+          <input type="text" id="student-name" name="studentName" placeholder="예: 김꿈틀" required />
+          <label for="parent-email">이메일</label>
+          <input type="email" id="parent-email" name="parentEmail" placeholder="예: happy@school.kr" required />
+          <button type="submit">신청하기</button>
+        </form>
+      </section>
+
+      <section class="grid-two" aria-label="회원 서비스">
+        <div>
+          <h2>회원가입</h2>
+          <p>일정, 숙제, 사진을 한 번에 확인할 수 있어요.</p>
+          <form data-form="signup">
+            <label for="signup-id">아이디</label>
+            <input type="text" id="signup-id" name="signupId" placeholder="아이디를 입력하세요" minlength="4" required />
+            <label for="signup-password">비밀번호</label>
+            <input type="password" id="signup-password" name="signupPassword" placeholder="8자 이상" minlength="8" required />
+            <label for="signup-email">이메일</label>
+            <input type="email" id="signup-email" name="signupEmail" placeholder="예: hello@school.kr" required />
+            <button type="submit">가입하기</button>
+          </form>
+        </div>
+        <div>
+          <h2>로그인</h2>
+          <p>학급 활동 현황을 바로 확인해 보세요.</p>
+          <form data-form="login">
+            <label for="login-id">아이디</label>
+            <input type="text" id="login-id" name="loginId" placeholder="아이디" required />
+            <label for="login-password">비밀번호</label>
+            <input type="password" id="login-password" name="loginPassword" placeholder="비밀번호" required />
+            <button type="submit">로그인</button>
+          </form>
+        </div>
+      </section>
+
+      <section aria-labelledby="message-title">
+        <h2 id="message-title">자유롭게 한마디</h2>
+        <p>학생과 학부모 모두 전하고 싶은 말을 남겨주세요.</p>
+        <form data-form="board">
+          <label for="message-writer">작성자</label>
+          <input type="text" id="message-writer" name="messageWriter" placeholder="이름 또는 별명" required />
+          <label for="message-content">메시지</label>
+          <textarea id="message-content" name="messageContent" placeholder="오늘 있었던 기쁜 일을 나눠요 :)" required></textarea>
+          <button type="submit">남기기</button>
+        </form>
+        <ul class="list" data-board-list aria-live="polite"></ul>
+      </section>
+    </main>
+    <footer>© 2025 6학년 1반 · 문의: homeroom@classroom.kr</footer>
+    <div class="toast" role="status" aria-live="polite"></div>
+    <script>
+      const notices = [
+        { title: "12월 체육대회", desc: "12월 20일(금) 운동장에서 6학년 체육대회가 열립니다. 간편한 운동복과 물을 준비해주세요.", date: "2025-12-12" },
+        { title: "겨울 방학 안내", desc: "방학은 12월 30일부터 시작합니다. 독서 기록장을 12월 27일까지 제출해주세요.", date: "2025-12-10" },
+        { title: "학부모 상담 주간", desc: "12월 둘째 주에 상담이 진행됩니다. 신청 폼에서 편한 시간을 골라주세요.", date: "2025-12-08" }
+      ];
+
+      const toast = document.querySelector(".toast");
+      const showToast = (message) => {
+        toast.textContent = message;
+        toast.dataset.show = "true";
+        setTimeout(() => {
+          toast.dataset.show = "false";
+        }, 2600);
+      };
+
+      const noticeContainer = document.querySelector("[data-notice-list]");
+      noticeContainer.innerHTML = notices
+        .map(
+          (notice) => `
+            <article class="card">
+              <h3>${notice.title}</h3>
+              <p>${notice.desc}</p>
+              <time datetime="${notice.date}">발행일: ${notice.date}</time>
+            </article>
+          `
+        )
+        .join("");
+
+      const boardList = document.querySelector("[data-board-list]");
+      const addBoardItem = (item) => {
+        const li = document.createElement("li");
+        li.innerHTML = \`<strong>\${item.messageWriter}</strong><p style="margin:0.35rem 0">\${item.messageContent}</p><time>\${new Date(
+          item.date
+        ).toLocaleString("ko-KR")}</time>\`;
+        boardList.prepend(li);
+      };
+
+      const persistForm = (formName, data) => {
+        const key = \`class6-\${formName}\`;
+        const stored = JSON.parse(localStorage.getItem(key) || "[]");
+        stored.push({ ...data, date: new Date().toISOString() });
+        localStorage.setItem(key, JSON.stringify(stored));
+        return stored.at(-1);
+      };
+
+      document.querySelectorAll("form[data-form]").forEach((form) => {
+        form.addEventListener("submit", (event) => {
+          event.preventDefault();
+          const formName = form.dataset.form;
+          const formData = Object.fromEntries(new FormData(form).entries());
+          const saved = persistForm(formName, formData);
+          form.reset();
+          if (formName === "board") addBoardItem(saved);
+          showToast("신청이 저장되었어요! (GitHub Pages 데모용)");
+        });
+      });
+
+      JSON.parse(localStorage.getItem("class6-board") || "[]").forEach(addBoardItem);
+    </script>
+  </body>
+</html>
