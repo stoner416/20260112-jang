@@ -215,13 +215,51 @@
       }
     </style>
   </head>
-  <body>
+  <body data-admin="false">
     <header>
       <h1>6학년 1반 우리 반 홈페이지</h1>
       <p>장준형 선생님과 함께하는 즐거운 교실, 가정과 학교가 만나는 따뜻한 소통 공간</p>
     </header>
     <main>
-      <section aria-labelledby="news-title">
+      <section aria-labelledby="login-title" id="login-section">
+        <h2 id="login-title">관리자 로그인</h2>
+        <p>ADMIN_ACCOUNT (jangadmin / class6star!)으로 로그인하면 우리 반 홈페이지 전체가 열립니다.</p>
+        <div class="grid-two" style="margin-top: 1.25rem">
+          <div>
+            <p data-user-status style="font-weight:600; color:var(--muted); margin-bottom:0.75rem">
+              아직 로그인하지 않았어요.
+            </p>
+            <div style="display:flex; flex-direction:column; gap:0.5rem; margin-bottom:1rem">
+              <button type="button" data-google-login style="background:#fff; color:#1f1f1f; border:2px solid #ffe1c4">
+                Google 계정으로 로그인
+              </button>
+              <button type="button" data-google-logout hidden>
+                Google 계정 로그아웃
+              </button>
+              <small style="color:var(--muted)">Google OAuth로 로그인하면 Firestore에 기록됩니다.</small>
+            </div>
+            <form data-form="login">
+              <label for="login-id">아이디</label>
+              <input type="text" id="login-id" name="loginId" placeholder="아이디" required />
+              <label for="login-password">비밀번호</label>
+              <input type="password" id="login-password" name="loginPassword" placeholder="비밀번호" required />
+              <button type="submit">로그인</button>
+            </form>
+            <small style="color:var(--muted)">관리자 외 로그인은 페이지를 열 수 없어요.</small>
+          </div>
+          <div class="card" style="border:2px solid #ffd9b5">
+            <h3>접속 안내</h3>
+            <p>관리자 로그인에 성공하면 아래 섹션(가정통신문, 게시판 등)이 자동으로 나타납니다.</p>
+            <ul style="padding-left: 1.2rem; margin:0; display:grid; gap:0.4rem; color:#5e4a00">
+              <li>로그인 이후 다시 방문하면 자동으로 복원돼요.</li>
+              <li>공유 PC에서는 사용 후 관리자 로그아웃을 눌러 주세요.</li>
+              <li>Google 로그인은 별도 기록용입니다.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section aria-labelledby="news-title" data-protected hidden>
         <div style="display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.75rem">
           <h2 id="news-title">가정통신문 & 새 소식</h2>
           <span style="color: var(--muted)">업데이트일: 2025-12-12</span>
@@ -229,7 +267,7 @@
         <div class="cards" data-notice-list></div>
       </section>
 
-      <section aria-labelledby="newsletter-title">
+      <section aria-labelledby="newsletter-title" data-protected hidden>
         <h2 id="newsletter-title">가정통신문 이메일로 받기</h2>
         <p>가정에서 간편하게 소식을 받아보세요. 신청하면 다음 발송에 자동으로 포함됩니다.</p>
         <form data-form="newsletter">
@@ -243,7 +281,7 @@
         </form>
       </section>
 
-      <section class="grid-two" aria-label="회원 서비스">
+      <section class="grid-two" aria-label="회원 서비스" data-protected hidden>
         <div>
           <h2>회원가입</h2>
           <p>일정, 숙제, 사진을 한 번에 확인할 수 있어요.</p>
@@ -257,20 +295,18 @@
             <button type="submit">가입하기</button>
           </form>
         </div>
-        <div>
-          <h2>로그인</h2>
-          <p>학급 활동 현황을 바로 확인해 보세요.</p>
-          <form data-form="login">
-            <label for="login-id">아이디</label>
-            <input type="text" id="login-id" name="loginId" placeholder="아이디" required />
-            <label for="login-password">비밀번호</label>
-            <input type="password" id="login-password" name="loginPassword" placeholder="비밀번호" required />
-            <button type="submit">로그인</button>
-          </form>
+        <div class="card" style="border:2px solid #ffd9b5">
+          <h3>학급 알림</h3>
+          <p>회원가입을 하면 숙제, 사진, 알림장을 한 번에 확인할 수 있는 공간이 열립니다.</p>
+          <ul style="padding-left:1.2rem; margin:0; display:grid; gap:0.35rem">
+            <li>숙제 제출 현황을 교실과 공유</li>
+            <li>학부모 상담 예약 현황 확인</li>
+            <li>반 친구들과 응원 메시지 남기기</li>
+          </ul>
         </div>
       </section>
 
-      <section id="admin-panel" hidden aria-labelledby="admin-title">
+      <section id="admin-panel" data-protected hidden aria-labelledby="admin-title">
         <h2 id="admin-title">관리자 콘솔</h2>
         <p data-admin-status>관리자 모드가 켜지면 파이어베이스 데이터 현황을 확인할 수 있어요.</p>
         <div style="margin-top: 1rem; background:#fff7ea; border-radius:18px; padding:1rem; border:1px solid #ffe0b0">
@@ -283,7 +319,7 @@
         <button type="button" data-admin-logout style="margin-top:1rem; width:200px">관리자 로그아웃</button>
       </section>
 
-      <section aria-labelledby="message-title">
+      <section aria-labelledby="message-title" data-protected hidden>
         <h2 id="message-title">자유롭게 한마디</h2>
         <p>학생과 학부모 모두 전하고 싶은 말을 남겨주세요.</p>
         <form data-form="board">
@@ -302,6 +338,13 @@
     <script type="module">
       import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
       import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-analytics.js";
+      import {
+        getAuth,
+        signInWithPopup,
+        GoogleAuthProvider,
+        signOut,
+        onAuthStateChanged
+      } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
       import {
         getFirestore,
         collection,
@@ -324,12 +367,23 @@
 
       const app = initializeApp(firebaseConfig);
       getAnalytics(app);
+      const auth = getAuth(app);
+      const googleProvider = new GoogleAuthProvider();
+      googleProvider.setCustomParameters({ prompt: "select_account" });
       const db = getFirestore(app);
       const ADMIN_ACCOUNT = { id: "jangadmin", password: "class6star!" };
       const ADMIN_STORAGE_KEY = "class6-admin-auth";
       const adminPanel = document.getElementById("admin-panel");
       const adminStatus = adminPanel?.querySelector("[data-admin-status]");
       const adminLogoutBtn = adminPanel?.querySelector("[data-admin-logout]");
+      const googleLoginBtn = document.querySelector("[data-google-login]");
+      const googleLogoutBtn = document.querySelector("[data-google-logout]");
+      const userStatusText = document.querySelector("[data-user-status]");
+      const toggleProtectedSections = (shouldShow) => {
+        document.querySelectorAll("[data-protected]").forEach((section) => {
+          section.hidden = !shouldShow;
+        });
+      };
 
       const toast = document.querySelector(".toast");
       const showToast = (message) => {
@@ -376,8 +430,8 @@
       const isAdminCredential = (data) => data.loginId === ADMIN_ACCOUNT.id && data.loginPassword === ADMIN_ACCOUNT.password;
 
       const enableAdminMode = () => {
-        if (!adminPanel) return;
-        adminPanel.hidden = false;
+        document.body.dataset.admin = "true";
+        toggleProtectedSections(true);
         if (adminStatus) {
           adminStatus.textContent = "관리자 모드가 활성화되었습니다. Firestore 데이터 현황을 점검하세요.";
         }
@@ -385,8 +439,8 @@
       };
 
       const disableAdminMode = () => {
-        if (!adminPanel) return;
-        adminPanel.hidden = true;
+        document.body.dataset.admin = "false";
+        toggleProtectedSections(false);
         if (adminStatus) {
           adminStatus.textContent = "관리자 모드가 켜지면 파이어베이스 데이터 현황을 확인할 수 있어요.";
         }
@@ -453,6 +507,53 @@
             submitButton.disabled = false;
           }
         });
+      });
+
+      const updateUserStatus = (user) => {
+        if (!userStatusText) return;
+        if (user) {
+          userStatusText.textContent = `${user.displayName ?? "익명"} (${user.email ?? "이메일 없음"})님이 로그인 중이에요.`;
+          userStatusText.style.color = "var(--primary)";
+          googleLoginBtn?.setAttribute("hidden", "true");
+          googleLogoutBtn?.removeAttribute("hidden");
+        } else {
+          userStatusText.textContent = "아직 로그인하지 않았어요.";
+          userStatusText.style.color = "var(--muted)";
+          googleLoginBtn?.removeAttribute("hidden");
+          googleLogoutBtn?.setAttribute("hidden", "true");
+        }
+      };
+
+      googleLoginBtn?.addEventListener("click", async () => {
+        try {
+          const result = await signInWithPopup(auth, googleProvider);
+          const user = result.user;
+          await addDoc(collection(db, "login"), {
+            loginId: user.uid,
+            loginEmail: user.email ?? "",
+            provider: "google",
+            displayName: user.displayName ?? "무명 사용자",
+            createdAt: serverTimestamp()
+          });
+          showToast("Google 로그인에 성공했어요!");
+        } catch (error) {
+          console.error(error);
+          showToast("Google 로그인에 실패했습니다.");
+        }
+      });
+
+      googleLogoutBtn?.addEventListener("click", async () => {
+        try {
+          await signOut(auth);
+          showToast("로그아웃되었습니다.");
+        } catch (error) {
+          console.error(error);
+          showToast("로그아웃 중 문제가 발생했습니다.");
+        }
+      });
+
+      onAuthStateChanged(auth, (user) => {
+        updateUserStatus(user);
       });
 
       if (localStorage.getItem(ADMIN_STORAGE_KEY) === "true") {
