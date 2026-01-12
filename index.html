@@ -270,6 +270,19 @@
         </div>
       </section>
 
+      <section id="admin-panel" hidden aria-labelledby="admin-title">
+        <h2 id="admin-title">관리자 콘솔</h2>
+        <p data-admin-status>관리자 모드가 켜지면 파이어베이스 데이터 현황을 확인할 수 있어요.</p>
+        <div style="margin-top: 1rem; background:#fff7ea; border-radius:18px; padding:1rem; border:1px solid #ffe0b0">
+          <p style="margin:0 0 0.5rem"><strong>Firestore 임시 규칙</strong></p>
+          <p style="margin:0; color:#6b4b00">
+            2026년 2월 11일까지 누구나 읽기/쓰기 가능한 테스트 규칙이 적용 중입니다.
+            <br />만료 전에 반드시 보안 규칙을 강화해주세요.
+          </p>
+        </div>
+        <button type="button" data-admin-logout style="margin-top:1rem; width:200px">관리자 로그아웃</button>
+      </section>
+
       <section aria-labelledby="message-title">
         <h2 id="message-title">자유롭게 한마디</h2>
         <p>학생과 학부모 모두 전하고 싶은 말을 남겨주세요.</p>
@@ -312,6 +325,11 @@
       const app = initializeApp(firebaseConfig);
       getAnalytics(app);
       const db = getFirestore(app);
+      const ADMIN_ACCOUNT = { id: "jangadmin", password: "class6star!" };
+      const ADMIN_STORAGE_KEY = "class6-admin-auth";
+      const adminPanel = document.getElementById("admin-panel");
+      const adminStatus = adminPanel?.querySelector("[data-admin-status]");
+      const adminLogoutBtn = adminPanel?.querySelector("[data-admin-logout]");
 
       const toast = document.querySelector(".toast");
       const showToast = (message) => {
@@ -355,6 +373,31 @@
         }
       };
 
+      const isAdminCredential = (data) => data.loginId === ADMIN_ACCOUNT.id && data.loginPassword === ADMIN_ACCOUNT.password;
+
+      const enableAdminMode = () => {
+        if (!adminPanel) return;
+        adminPanel.hidden = false;
+        if (adminStatus) {
+          adminStatus.textContent = "관리자 모드가 활성화되었습니다. Firestore 데이터 현황을 점검하세요.";
+        }
+        localStorage.setItem(ADMIN_STORAGE_KEY, "true");
+      };
+
+      const disableAdminMode = () => {
+        if (!adminPanel) return;
+        adminPanel.hidden = true;
+        if (adminStatus) {
+          adminStatus.textContent = "관리자 모드가 켜지면 파이어베이스 데이터 현황을 확인할 수 있어요.";
+        }
+        localStorage.removeItem(ADMIN_STORAGE_KEY);
+      };
+
+      adminLogoutBtn?.addEventListener("click", () => {
+        disableAdminMode();
+        showToast("관리자 모드가 종료되었습니다.");
+      });
+
       const loadBoardMessages = async () => {
         boardList.innerHTML = "<li>게시판을 불러오는 중입니다...</li>";
         try {
@@ -386,6 +429,13 @@
           submitButton.disabled = true;
           const formName = form.dataset.form;
           const formData = Object.fromEntries(new FormData(form).entries());
+          if (formName === "login" && isAdminCredential(formData)) {
+            enableAdminMode();
+            showToast("관리자 모드가 활성화되었습니다.");
+            form.reset();
+            submitButton.disabled = false;
+            return;
+          }
           try {
             await addDoc(collection(db, formName), {
               ...formData,
@@ -404,6 +454,10 @@
           }
         });
       });
+
+      if (localStorage.getItem(ADMIN_STORAGE_KEY) === "true") {
+        enableAdminMode();
+      }
 
       loadBoardMessages();
     </script>
